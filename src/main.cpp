@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
 
   Server piServer(11);
   DCMotor mainMotor(0);
+
   mainMotor.Set(0.7);
 
   for(;;)
