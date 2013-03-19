@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "../include/Server.h"
+#include "../include/server.h"
 #include "../include/DCMotor.h"
 
 using namespace std;
@@ -12,15 +12,10 @@ int main(int argc, char* argv[])
 {
   cout << "Plancobile " << version << endl << endl;
 
-  Server piServer(11);
+  Server piServer(51717);
   DCMotor mainMotor(0);
 
   mainMotor.Set(0.7);
-
-  for(;;)
-    {
-
-    }
 
   return 0;
 }
