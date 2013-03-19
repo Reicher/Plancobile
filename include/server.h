@@ -15,6 +15,8 @@ class Server
   Server(int portnum = 51717);
 
  private:
+  void OpenSocket();
+  void BindSocket();
   void Error(const char *msg);
 
   int m_sockfd, m_newsockfd, m_portNum;
