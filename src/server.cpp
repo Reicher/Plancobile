@@ -35,7 +35,6 @@ Server::Server(int portnum)
   cout << "Message from client: " << buffer << endl;
 
   n = write(m_newsockfd, "I got your message", 18);
-  cout << endl;
   if(n < 0)
     Error("ERROR writing to socket");
 
