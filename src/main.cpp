@@ -12,7 +12,8 @@ int main(int argc, char* argv[])
 {
   cout << "Plancobile " << version << endl << endl;
 
-  Server piServer(51717);
+  Server piServer(51717);  
+
   DCMotor mainMotor(0);
 
   mainMotor.Set(0.7);

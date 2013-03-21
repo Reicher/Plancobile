@@ -3,32 +3,57 @@
 Server::Server(int portnum)
   : m_portNum(portnum)
 {
-  int n;
-
   OpenSocket();
   BindSocket();
-  
-  listen(m_sockfd, 5);
 
-  m_clilen = sizeof(m_cli_addr);
-  m_newsockfd = accept(m_sockfd, (struct sockaddr *) &m_cli_addr, &m_clilen);
-  if(m_newsockfd < 0)
-    Error("Error on accept!");
+  //thread t(&Server::ListenAfterStuff, this);
+  //t.join();
+}
 
-  bzero(buffer, 256);
-  n = read(m_newsockfd, buffer, 255);
-  if(n < 0)
-    Error("Error reading from sock!");
-
-  cout << "Message from client: " << buffer << endl;
-
-  n = write(m_newsockfd, "I got your message", 18);
-  if(n < 0)
-    Error("ERROR writing to socket");
-
+Server::~Server()
+{
   close(m_newsockfd);
   close(m_sockfd);
 }
+
+void Server::ListenAfterStuff()
+{
+  int n;
+
+  while(1){
+    listen(m_sockfd, 5);
+    
+    m_clilen = sizeof(m_cli_addr);
+    m_newsockfd = accept(m_sockfd, (struct sockaddr *) &m_cli_addr, &m_clilen);
+    if(m_newsockfd < 0)
+      Error("Error on accept!");
+    
+    bzero(buffer, 256);
+    n = read(m_newsockfd, buffer, 255);
+    if(n < 0)
+      Error("Error reading from sock!");
+    
+    cout << "Message from client: " << buffer << endl;
+    
+    //PARSE AND ADD MSG TO LIST HERE
+    
+    n = write(m_newsockfd, "I got your message", 18);
+    if(n < 0)
+      Error("ERROR writing to socket");
+  }
+}
+
+bool Server::UnreadMsg()
+{
+  return !m_unReadMsgs.empty();
+}
+
+NetMsg Server::GetMsg()
+{
+  NetMsg tmp = m_unReadMsgs.front();
+  m_unReadMsgs.pop_front();
+  return tmp;
+} 
 
 void Server::OpenSocket()
 {
