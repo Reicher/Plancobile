@@ -7,27 +7,25 @@
 #include <netinet/in.h>
 #include <iostream>
 #include <list>
-#include <thread>
+#include <pthread.h>
 
 #include "networkMsg.h"
 
-
-using namespace std;
 
 class Server
 {
  public:
   Server(int portnum = 51717);
   ~Server();
+  static void *runHelper(void *classRef);
 
   bool UnreadMsg();
   NetMsg GetMsg();
+  void *ListenAfterStuff();
 
  private:
   void OpenSocket();
   void BindSocket();
-  void ListenAfterStuff();
-
   void Error(const char *msg);
 
   int m_sockfd, m_newsockfd, m_portNum;

@@ -1,7 +1,7 @@
 # Makefile for Plancobile
 CC=g++ -std=c++0x
-CFLAGS=-I/usr/local/include -I/include -I/src -pthread -c 
-LFLAGS=-L/usr/local/lib -lwiringPi -o
+CFLAGS=-I/usr/local/include -I/include -I/src  -c 
+LFLAGS=-L/usr/local/lib -lwiringPi -lpthread -o
 
 CFLAGSLIGHT= -I/src -c
 LFLAGSLIGHT= -o
@@ -25,5 +25,5 @@ DCMotor.o: src/DCMotor.cpp include/DCMotor.h
 	$(CC) $(CFLAGS) src/DCMotor.cpp
 server.o: src/server.cpp include/server.h include/networkMsg.h
 	$(CC) $(CFLAGS) src/server.cpp
-lean: 
+clean: 
 	rm -rf *.o

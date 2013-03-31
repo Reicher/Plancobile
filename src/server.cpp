@@ -16,7 +16,12 @@ Server::~Server()
   close(m_sockfd);
 }
 
-void Server::ListenAfterStuff()
+void *Server::runHelper(void *classRef)
+{
+  return ((Server *)classRef)->ListenAfterStuff();
+}
+
+void *Server::ListenAfterStuff()
 {
   int n;
 
@@ -73,7 +78,7 @@ void Server::BindSocket()
   m_serv_addr.sin_addr.s_addr = INADDR_ANY;
   m_serv_addr.sin_port = htons(m_portNum);
 
-  if(bind(m_sockfd, (struct sockaddr *) &m_serv_addr, sizeof(m_serv_addr)) > 0)
+  if( bind(m_sockfd, (struct sockaddr *) &m_serv_addr, sizeof(m_serv_addr)) < 0 )
     Error("Error on binding!");
 }
 
