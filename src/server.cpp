@@ -5,9 +5,7 @@ Server::Server(int portnum)
 {
   OpenSocket();
   BindSocket();
-
-  //thread t(&Server::ListenAfterStuff, this);
-  //t.join();
+  WaitForClient();
 }
 
 Server::~Server()
@@ -16,49 +14,22 @@ Server::~Server()
   close(m_sockfd);
 }
 
-void *Server::runHelper(void *classRef)
-{
-  return ((Server *)classRef)->ListenAfterStuff();
-}
-
-void *Server::ListenAfterStuff()
+NetMsg Server::Read()
 {
   int n;
 
-  while(1){
-    listen(m_sockfd, 5);
-    
-    m_clilen = sizeof(m_cli_addr);
-    m_newsockfd = accept(m_sockfd, (struct sockaddr *) &m_cli_addr, &m_clilen);
-    if(m_newsockfd < 0)
-      Error("Error on accept!");
-    
-    bzero(buffer, 256);
-    n = read(m_newsockfd, buffer, 255);
-    if(n < 0)
-      Error("Error reading from sock!");
-    
-    cout << "Message from client: " << buffer << endl;
-    
-    //PARSE AND ADD MSG TO LIST HERE
-    
-    n = write(m_newsockfd, "I got your message", 18);
-    if(n < 0)
-      Error("ERROR writing to socket");
-  }
-}
+  bzero(buffer, 256);
+  n = read(m_newsockfd, buffer, 255);
+  if(n < 0)
+    Error("Error reading from sock!");
+  
+  if(buffer[0] == 0)
+    return NetMsg(MsgType::Error, 0);
 
-bool Server::UnreadMsg()
-{
-  return !m_unReadMsgs.empty();
-}
+  cout << "Message from client: " << buffer << endl;
 
-NetMsg Server::GetMsg()
-{
-  NetMsg tmp = m_unReadMsgs.front();
-  m_unReadMsgs.pop_front();
-  return tmp;
-} 
+  return NetMsg(buffer);
+}
 
 void Server::OpenSocket()
 {
@@ -86,4 +57,42 @@ void Server::Error(const char *msg)
 {
   perror(msg);
   exit(1);
+}
+
+bool Server::WaitForClient()
+{
+  cout << "Waiting for client to connect......";
+
+  listen(m_sockfd, 5);
+
+  m_clilen = sizeof(m_cli_addr);
+  m_newsockfd = accept(m_sockfd, (struct sockaddr *) &m_cli_addr, &m_clilen);
+  
+  if(m_newsockfd < 0){
+    Error("Error on accept!");
+    return false;
+  }
+  
+   cout << "Connected!" << endl;
+   return true;
+}
+
+bool Server::HaveClient()
+{
+  fd_set rfd;
+  FD_ZERO(&rfd);
+  FD_SET(m_sockfd, &rfd);
+  timeval tv = {0};
+  select(m_sockfd+1, &rfd, 0, 0, &tv);
+  if(FD_ISSET(m_sockfd, &rfd))
+    return false;
+
+  return true;
+}
+
+bool Server::HaveMessage()
+{
+  int n = 0;
+  ioctl(m_sockfd, FIONREAD, &n);
+  return n == 0;
 }

@@ -1,7 +1,7 @@
 # Makefile for Plancobile
 CC=g++ -std=c++0x
 CFLAGS=-I/usr/local/include -I/include -I/src  -c 
-LFLAGS=-L/usr/local/lib -lwiringPi -lpthread -o
+LFLAGS=-L/usr/local/lib -lwiringPi -o
 
 CFLAGSLIGHT= -I/src -c
 LFLAGSLIGHT= -o

@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/time.h>
+#include <sys/ioctl.h>
+
 #include <iostream>
 #include <list>
 #include <pthread.h>
@@ -19,13 +23,15 @@ class Server
   ~Server();
   static void *runHelper(void *classRef);
 
-  bool UnreadMsg();
-  NetMsg GetMsg();
-  void *ListenAfterStuff();
+  NetMsg Read();
+  bool HaveClient();
+  bool HaveMessage();
+  bool WaitForClient();
 
  private:
   void OpenSocket();
-  void BindSocket();
+  void BindSocket(); 
+
   void Error(const char *msg);
 
   int m_sockfd, m_newsockfd, m_portNum;
@@ -34,5 +40,4 @@ class Server
 
   struct sockaddr_in m_serv_addr, m_cli_addr;
 
-  list<NetMsg> m_unReadMsgs;
 };

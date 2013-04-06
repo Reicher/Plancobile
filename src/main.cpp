@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
-#include <pthread.h>
 
 #include "../include/server.h"
 #include "../include/DCMotor.h"
+#include "../include/networkMsg.h"
 
 using namespace std;
 
@@ -14,14 +14,33 @@ int main(int argc, char* argv[])
   cout << "Plancobile " << version << endl << endl;
 
   Server piServer(51717);  
-  pthread_t serverThread;
-
-  pthread_create(&serverThread, NULL, &Server::runHelper, &piServer);
-  pthread_join(serverThread, NULL);
-
   DCMotor mainMotor(0);
 
-  mainMotor.Set(0.7);
+
+  while(1)
+    {
+      if( !piServer.HaveClient() )
+	piServer.WaitForClient();
+      
+      if( piServer.HaveMessage() ){
+	
+	NetMsg cmd = piServer.Read();
+	switch(cmd.GetMsgType())
+	  {
+	  case Drive:
+	    cout << "DRIVE: " << cmd.GetValue() << endl;
+	    break;
+	  case Bearing:
+	    cout << "BEARING!" << cmd.GetValue() << endl;
+	    break;
+	  case Error:
+	    continue;
+	    break;
+	  default:
+	    cout << "Something awful happend:(" << endl;
+	  }
+      }
+    }
 
   return 0;
 }
